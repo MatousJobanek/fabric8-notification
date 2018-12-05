@@ -139,7 +139,7 @@ test-unit: prebuild-check clean-coverage-unit $(COV_PATH_UNIT)
 test-unit-no-coverage: prebuild-check $(SOURCES)
 	$(call log-info,"Running test: $@")
 	$(eval TEST_PACKAGES:=$(shell go list ./... | grep -v $(ALL_PKGS_EXCLUDE_PATTERN)))
-	F8_DEVELOPER_MODE_ENABLED=1 F8_RESOURCE_UNIT_TEST=1 go test -v $(TEST_PACKAGES)
+	F8_DEVELOPER_MODE_ENABLED=1 F8_RESOURCE_UNIT_TEST=1 go test -v -vet off $(TEST_PACKAGES)
 
 .PHONY: test-unit-no-coverage-junit
 test-unit-no-coverage-junit: prebuild-check ${GO_JUNIT_BIN} ${TMP_PATH}
@@ -157,7 +157,7 @@ test-integration: prebuild-check clean-coverage-integration migrate-database $(C
 test-integration-no-coverage: prebuild-check migrate-database $(SOURCES)
 	$(call log-info,"Running test: $@")
 	$(eval TEST_PACKAGES:=$(shell go list ./... | grep -v $(ALL_PKGS_EXCLUDE_PATTERN)))
-	F8_DEVELOPER_MODE_ENABLED=1 F8_RESOURCE_DATABASE=1 F8_RESOURCE_UNIT_TEST=0 F8_POSTGRES_DATABASE=postgres go test -v $(TEST_PACKAGES)
+	F8_DEVELOPER_MODE_ENABLED=1 F8_RESOURCE_DATABASE=1 F8_RESOURCE_UNIT_TEST=0 F8_POSTGRES_DATABASE=postgres go test -v -vet off $(TEST_PACKAGES)
 
 .PHONY: test-remote
 ## Runs the remote tests and produces coverage files for each package.
@@ -168,13 +168,13 @@ test-remote: prebuild-check clean-coverage-remote $(COV_PATH_REMOTE)
 test-remote-no-coverage: prebuild-check $(SOURCES)
 	$(call log-info,"Running test: $@")
 	$(eval TEST_PACKAGES:=$(shell go list ./... | grep -v $(ALL_PKGS_EXCLUDE_PATTERN)))
-	F8_DEVELOPER_MODE_ENABLED=1 F8_RESOURCE_REMOTE=1 F8_RESOURCE_UNIT_TEST=0 go test -v $(TEST_PACKAGES)
+	F8_DEVELOPER_MODE_ENABLED=1 F8_RESOURCE_REMOTE=1 F8_RESOURCE_UNIT_TEST=0 go test -v -vet off $(TEST_PACKAGES)
 
 .PHONY: test-migration
 ## Runs the migration tests and should be executed before running the integration tests
 ## in order to have a clean database
 test-migration: prebuild-check
-	F8_RESOURCE_DATABASE=1 F8_POSTGRES_DATABASE=postgres go test ${PACKAGE_NAME}/migration -v
+	F8_RESOURCE_DATABASE=1 F8_POSTGRES_DATABASE=postgres go test -vet off ${PACKAGE_NAME}/migration -v
 
 # Downloads docker-compose to tmp/docker-compose if it does not already exist.
 define download-docker-compose
@@ -414,6 +414,7 @@ $(eval COV_OUT_FILE := $(COV_DIR)/$(PACKAGE_NAME)/coverage.$(TEST_NAME).mode-$(C
 @$(ENV_VAR) F8_DEVELOPER_MODE_ENABLED=1 F8_POSTGRES_HOST=$(F8_POSTGRES_HOST) \
 	go test $(PACKAGE_NAME) \
 		-v \
+		-vet off \
 		-coverprofile $(COV_OUT_FILE) \
 		-coverpkg $(ALL_PKGS_COMMA_SEPARATED) \
 		-covermode=$(COVERAGE_MODE) \
