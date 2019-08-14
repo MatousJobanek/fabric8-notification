@@ -1,1 +1,1 @@
-Notice: Your OpenShift.io free account is inactive
+Notice: Your Red Hat CodeReady Toolchain free account is inactive
